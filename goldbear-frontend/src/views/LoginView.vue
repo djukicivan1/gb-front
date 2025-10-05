@@ -40,7 +40,7 @@
           const user = res.data?.user || res.data?.data?.user || { email: this.email, role: res.data?.role || 'user' }
           if (!token) throw new Error('Token is not received')
           setAuth({ token, user })
-          this.$router.push('/')
+          this.$router.push('/home')
         } catch (e) {
           this.error = 'Login failed'
           console.error(e)

@@ -3,6 +3,7 @@ import { isLoggedIn, isAdmin } from '../auth'
 
 const Login = () => import('../views/LoginView.vue')
 const Layout = () => import('../views/Layout.vue')
+const Home = () => import('../views/HomeView.vue')
 const Tasks = () => import('../views/TaskView.vue')
 const Users = () => import('../views/UsersView.vue')
 const Vehicles = () => import('../views/VehiclesView.vue')
@@ -15,14 +16,15 @@ const router = createRouter({
       path: '/',
       component: Layout,
       children: [
-        { path: '', redirect: '/tasks' },
+        { path: '', redirect: '/home' },
+        { path: 'home', component: Home, meta: { requiresAuth: true } },
         { path: 'tasks', component: Tasks, meta: { requiresAuth: true } },
         { path: 'vehicles', component: Vehicles, meta: { requiresAuth: true } },
         { path: 'users', component: Users, meta: { requiresAuth: true, roles: ['admin'] } },
-      ]
+      ],
     },
-    { path: '/:pathMatch(.*)*', redirect: '/' }
-  ]
+    { path: '/:pathMatch(.*)*', redirect: '/' },
+  ],
 })
 
 router.beforeEach((to) => {

@@ -1,5 +1,6 @@
 <template>
     <v-container>
+      <v-btn class="mb-5" prepend-icon="mdi-arrow-left" @click="$router.push('/home')">Back</v-btn>
       <v-row class="mb-4" align="center">
         <v-col cols="12" sm="6">
           <v-text-field v-model="search" label="Pretraga" />

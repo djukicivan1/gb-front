@@ -1,8 +1,9 @@
 <template>
     <v-container>
-      <v-row class="mb-4" align="center">
+      <v-btn class="mb-5" prepend-icon="mdi-arrow-left" @click="$router.push('/home')">Back</v-btn>
+      <v-row class="mb-2" align="center">
         <v-col cols="12" sm="6">
-          <v-text-field v-model="search" label="Pretraga" />
+          <v-text-field v-model="search" label="Search" />
         </v-col>
         <v-col cols="12" sm="6" class="text-right">
           <v-btn @click="openCreate" prepend-icon="mdi-plus">Add vehicle</v-btn>
