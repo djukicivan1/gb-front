@@ -2,7 +2,7 @@
   <v-container>
     <v-row class="mb-6">
       <v-col cols="12">
-        <h2 class="text-h5">Welcome, {{ user?.name?.split(' ')[0] }}!</h2>
+        <h2 class="text-h5">Welcome, {{ user?.name?.split(' ')[0] || user?.name }}!</h2>
       </v-col>
     </v-row>
 
