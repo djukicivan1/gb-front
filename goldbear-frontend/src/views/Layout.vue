@@ -4,7 +4,7 @@
         <v-app-bar-title>GoldBear Demo</v-app-bar-title>
         <v-spacer />
         <div class="mr-4">{{ user?.email }} ({{ user?.role || 'user' }})</div>
-        <v-btn variant="text" @click="logout">Logout</v-btn>
+        <v-btn variant="text" color="red" @click="logout">Logout</v-btn>
       </v-app-bar>
   
       <v-navigation-drawer app>

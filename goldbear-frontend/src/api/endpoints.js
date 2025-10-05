@@ -48,7 +48,7 @@ export const vehiclesApi = {
     return http.get(`/vehicle/${id}`)
   },
   create({ title, brand, licence_plate, year }) {
-    return http.get('/vehicle', { params: { title, brand, licence_plate, year } })
+    return http.post('/vehicle', null, { params: { title, brand, licence_plate, year } })
   },
   update(id, { title, brand, licence_plate, year }) {
     return http.post('/vehicle', null, { params: { id, title, brand, licence_plate, year } })
