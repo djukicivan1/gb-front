@@ -9,7 +9,7 @@
     <v-row>
       <!-- Tasks -->
       <v-col cols="12" sm="4">
-        <v-card class="hover-card" variant="outlined" @click="$router.push('/tasks')">
+        <v-card class="hover-card h-100" variant="outlined" @click="$router.push('/tasks')">
           <v-card-title>Tasks</v-card-title>
           <v-card-text>View, search and CRUD for tasks.</v-card-text>
           <v-card-actions>
@@ -20,7 +20,7 @@
 
       <!-- Users (only admin) -->
       <v-col cols="12" sm="4" v-if="isAdmin">
-        <v-card class="hover-card" variant="outlined" @click="$router.push('/users')">
+        <v-card class="hover-card h-100" variant="outlined" @click="$router.push('/users')">
           <v-card-title>Users</v-card-title>
           <v-card-text>View, search and CRUD for users.</v-card-text>
           <v-card-actions>
@@ -31,7 +31,7 @@
 
       <!-- Vehicles -->
       <v-col cols="12" sm="4">
-        <v-card class="hover-card" variant="outlined" @click="$router.push('/vehicles')">
+        <v-card class="hover-card h-100" variant="outlined" @click="$router.push('/vehicles')">
           <v-card-title>Vehicles</v-card-title>
           <v-card-text>View, search and CRUD for vehicles.</v-card-text>
           <v-card-actions>

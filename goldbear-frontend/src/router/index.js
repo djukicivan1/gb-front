@@ -41,7 +41,7 @@ router.beforeEach((to) => {
 
   if (roles && roles.length) {
     if (roles.includes('admin') && !isAdmin()) {
-      return { path: '/tasks' }
+      return { path: '/home' }
     }
   }
 

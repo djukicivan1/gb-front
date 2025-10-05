@@ -13,7 +13,7 @@
               type="password"
             />
             <div class="text-caption">
-              Example accounts: <i>rwest@example.org</i>, <i>keyshawn37@example.net (admin)</i>,
+              Example accounts: <i>rwest@example.org</i>, <i>marlon.green@example.com (admin)</i>,
               <i>qflatley@example.com</i>
             </div>
           </v-card-text>

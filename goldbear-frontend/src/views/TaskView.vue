@@ -1,39 +1,41 @@
 <template>
   <v-container>
     <v-btn class="mb-5" prepend-icon="mdi-arrow-left" @click="$router.push('/home')">Back</v-btn>
-    <v-row class="mb-4" align="center">
+    <v-row align="center" class="mb-4">
       <v-col cols="12" sm="6">
-        <v-text-field v-model="search" label="Search" />
+        <v-text-field v-model="search" label="Search tasks" clearable />
       </v-col>
       <v-col cols="12" sm="6" class="text-right">
-        <v-btn @click="openCreate" prepend-icon="mdi-plus">Add task</v-btn>
+        <v-btn color="primary" @click="openCreate" prepend-icon="mdi-plus">Add task</v-btn>
       </v-col>
     </v-row>
 
-    <v-data-table :items="filtered" :headers="headers" :loading="loading" item-key="id">
+    <v-data-table :items="indexed" :headers="headers" :loading="loading" item-value="id">
       <template #item.actions="{ item }">
-        <v-btn icon="mdi-pencil" variant="text" @click="openEdit(item)"></v-btn>
-        <v-btn icon="mdi-delete" variant="text" @click="remove(item)"></v-btn>
+        <v-btn icon="mdi-pencil-outline" variant="text" @click="openEdit(item)" />
+        <v-btn icon="mdi-delete-outline" variant="text" @click="removeItem(item)" />
       </template>
     </v-data-table>
 
     <v-dialog v-model="dialog" max-width="500">
       <v-card>
-        <v-card-title>{{ editId ? 'Edit' : 'Add' }} task</v-card-title>
+        <v-card-title>{{ editId ? 'Edit' : 'Add' }} Task</v-card-title>
         <v-card-text>
           <v-text-field v-model="form.title" label="Title" />
-          <v-text-field v-model="form.description" label="Description" />
+          <v-textarea v-model="form.description" label="Description" />
           <v-text-field v-model="form.due_date" label="Due date (YYYY-MM-DD HH:mm:ss)" />
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="dialog = false">Cancel</v-btn>
-          <v-btn @click="save" :loading="saving">Save</v-btn>
+          <v-btn text @click="dialog = false">Cancel</v-btn>
+          <v-btn color="primary" @click="save" :loading="saving">Save</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-    <v-alert v-if="error" type="error" class="mt-4">{{ error }}</v-alert>
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="2000">
+      {{ snackbar.text }}
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -42,16 +44,21 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { tasksApi } from '../api/endpoints'
 
 const items = ref([])
-const loading = ref(false)
-const saving = ref(false)
-const error = ref('')
 const search = ref('')
+const loading = ref(false)
 const dialog = ref(false)
+const saving = ref(false)
 const editId = ref(null)
-const form = reactive({ title: '', description: '', due_date: '' })
+const snackbar = reactive({ show: false, text: '', color: 'success' })
+
+const form = reactive({
+  title: '',
+  description: '',
+  due_date: '',
+})
 
 const headers = [
-  { title: 'ID', key: 'id' },
+  { title: '#', key: 'no', sortable: false },
   { title: 'Title', key: 'title' },
   { title: 'Description', key: 'description' },
   { title: 'Due date', key: 'due_date' },
@@ -59,28 +66,27 @@ const headers = [
 ]
 
 const filtered = computed(() => {
-  const s = (search.value || '').toLowerCase()
-  if (!s) return items.value
-  return items.value.filter(
-    (x) =>
-      String(x.id).includes(s) ||
-      (x.title || '').toLowerCase().includes(s) ||
-      (x.description || '').toLowerCase().includes(s) ||
-      (x.due_date || '').toLowerCase().includes(s),
-  )
+  const s = search.value.toLowerCase()
+  return !s
+    ? items.value
+    : items.value.filter(
+        (x) =>
+          (x.title || '').toLowerCase().includes(s) ||
+          (x.description || '').toLowerCase().includes(s),
+      )
 })
+
 const indexed = computed(() => filtered.value.map((row, i) => ({ ...row, no: i + 1 })))
 
 onMounted(fetchList)
 
 async function fetchList() {
   loading.value = true
-  error.value = ''
   try {
     const res = await tasksApi.list()
     items.value = res.data?.data || res.data || []
   } catch (e) {
-    error.value = 'Failed to load tasks'
+    showSnack('Failed to load tasks', 'error')
     console.error(e)
   } finally {
     loading.value = false
@@ -95,37 +101,54 @@ function openCreate() {
 
 function openEdit(row) {
   editId.value = row.id
-  Object.assign(form, { title: row.title, description: row.description, due_date: row.due_date })
+  Object.assign(form, {
+    title: row.title,
+    description: row.description,
+    due_date: row.due_date,
+  })
   dialog.value = true
 }
 
 async function save() {
+  if (!form.title.trim()) {
+    showSnack('Title is required', 'error')
+    return
+  }
+
   saving.value = true
   try {
     if (editId.value) {
       await tasksApi.update(editId.value, { ...form })
+      showSnack('Task updated', 'success')
     } else {
       await tasksApi.create({ ...form })
+      showSnack('Task created', 'success')
     }
     dialog.value = false
     await fetchList()
   } catch (e) {
-    const msg = e?.response?.data?.message || e?.response?.data || e.message || 'Saving failed'
-    alert(msg)
-    console.error('Save error:', e?.response || e)
+    showSnack('Saving failed', 'error')
+    console.error(e)
   } finally {
     saving.value = false
   }
 }
 
 async function removeItem(row) {
-  if (!confirm('Delete this task?')) return
+  if (!confirm(`Delete task "${row.title}"?`)) return
   try {
     await tasksApi.remove(row.id)
+    showSnack('Task deleted', 'success')
     await fetchList()
   } catch (e) {
-    alert('Delete failed')
+    showSnack('Delete failed', 'error')
     console.error(e)
   }
+}
+
+function showSnack(text, color = 'success') {
+  snackbar.text = text
+  snackbar.color = color
+  snackbar.show = true
 }
 </script>
